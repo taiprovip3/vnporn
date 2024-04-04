@@ -1,14 +1,49 @@
 /* eslint-disable semi */
 const express = require('express');
 const axios = require('axios');
-const fs = require('fs');
 const app = express();
 const path = require('path');
+const { VK } = require('vk-io');
+require('dotenv').config();
 
+// Configurations
 app.use(express.static(path.join(__dirname, 'public')));
+app.set('views', path.join(__dirname, '/public/views/'));
+// Certificates
+// const https = require('https');
+// const fs = require('fs');
+// const options = {
+//   key: fs.readFileSync('./certificates/nhinguyen.tech/private.key'),
+//   cert: fs.readFileSync('./certificates/nhinguyen.tech/certificate.crt')
+// };
+// const server = https.createServer(options, app);
+const vk = new VK({
+  token: process.env.TOKEN
+});
 
+// Init mongoDB
+
+
+// Routing
 app.get('/', (req, res) => {
-  return res.sendFile(path.join(__dirname, 'public/views/index.html'));
+  return res.sendFile('index.html', { root: './public/views/' });
+});
+
+app.post('/webhook', async (req, res) => {
+  try {
+    console.log('Do somethings below...');
+    const videoId = '456239020';
+    const videoInfo = await vk.api.video.get({
+      videos: videoId
+    });
+
+    console.log('videoInfo=', videoInfo);
+    const videoUrl = videoInfo.items[0].player;
+    console.log('videoUrl=', videoUrl);
+  } catch (error) {
+    console.error(error);
+  }
+  res.status(200).end('ok');
 });
 
 app.get('/video', async (req, res) => {
@@ -54,7 +89,7 @@ app.get('/embed', (req, res) => {
   res.send(html);
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 80;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
