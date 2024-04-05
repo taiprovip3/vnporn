@@ -11,8 +11,7 @@ class MongoDB {
             //     .connect(process.env.MONGODB_URI)
             //     .then(() => console.log('Connected to MongoDB'))
             //     .catch((err) => console.error('Error connecting to MongoDB:', err));
-            const obj = await mongoose.connect(process.env.MONGODB_URI);
-            console.log('obj=', obj);
+            await mongoose.connect(process.env.MONGODB_URI);
             this.isConnected = true;
             console.log('MongoDB connected successfully');
         } catch (error) {

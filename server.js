@@ -4,6 +4,9 @@ const axios = require('axios');
 const app = express();
 const path = require('path');
 const { VK } = require('vk-io');
+const mongoDB = require('./src/modules/mongoDB/mongoDB');
+const videoModel = require('./src/modules/model/VideoModel');
+const commentModel = require('./src/modules/model/CommentModel');
 require('dotenv').config();
 
 // Configurations
@@ -22,11 +25,52 @@ const vk = new VK({
 });
 
 // Init mongoDB
-
+mongoDB.init();
 
 // Routing
 app.get('/', (req, res) => {
   return res.sendFile('index.html', { root: './public/views/' });
+});
+
+app.get('/generate', (req, res) => {
+  const VideoModel = videoModel.getModel();
+  // const newVideo = new VideoModel({
+  //   owner_id: "856048053",
+  //   video_id: "456239020",
+  //   locale: "vi",
+  //   title: "Lỗi AI CFVN 2023",
+  //   description: "Lỗi ai cfvn 2023",
+  //   created_date: new Date(),
+  //   views: 0,
+  //   likes: 0,
+  //   tag: ['cfvn', 'bug_cf', 'cfbug'],
+  //   link: "https://vk.com/video856048053_456239020"
+  // });
+  const newVideo = new VideoModel({
+    owner_id: "856048053",
+    video_id: "456239019",
+    locale: "vi",
+    title: "Minecraft share files skyblock 1.12.x | Map đẹp, nhiều tính năng hay 2021",
+    description: "Minecraft share files skyblock 1.12.x | Map đẹp, nhiều tính năng hay 2021",
+    created_date: new Date(),
+    views: 0,
+    likes: 0,
+    tag: ['minecraft', 'chia sẽ file skyblock', 'minecraft share file'],
+    link: "https://vk.com/video856048053_456239019"
+  });
+  newVideo.save();
+
+  const CommentModel = commentModel.getModel();
+  const newComment = new CommentModel({
+    video_id: "456239019",
+    username: "Anonymous",
+    comment: "Great video share file!",
+    created_date: new Date()
+  });
+  newComment.save();
+
+  console.log('Generate data successfully!');
+  return res.send('ok');
 });
 
 app.post('/webhook', async (req, res) => {
@@ -89,7 +133,7 @@ app.get('/embed', (req, res) => {
   res.send(html);
 });
 
-const PORT = process.env.PORT || 80;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
